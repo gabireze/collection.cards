@@ -62,16 +62,13 @@ find ./assets -mindepth 1 -type d | while read -r src; do
   ln -s "$src_abs" "$dst" 2>/dev/null || true
 done
 
-# Remove the old ./proxy.ts symlink if it exists and points to a non-existing location
-if [ -L "./proxy.ts" ] && [ ! -e "./proxy.ts" ]; then
-  rm "./proxy.ts"
-fi
-# Create symlink for proxy.ts if avaiable in assets
-if [ -f "./$ASSETS_DIR/proxy.ts" ]; then
-  dst="./proxy.ts"
-  src_abs="$(realpath "./$ASSETS_DIR/proxy.ts")"
-  [ -e "$dst" ] && continue
-  ln -s "$src_abs" "$dst" 2>/dev/null || true
+# Link shared icon source files that are imported by the generated icon
+# directories. Directory-only linking leaves icons/pokemon/* unable to resolve
+# ../../CC on a fresh checkout.
+if [ -f "./$ASSETS_DIR/icons/CC.tsx" ]; then
+  dst="./icons/CC.tsx"
+  src_abs="$(realpath "./$ASSETS_DIR/icons/CC.tsx")"
+  [ -e "$dst" ] || ln -s "$src_abs" "$dst" 2>/dev/null || true
 fi
 
 echo "✅ Assets setup complete"
